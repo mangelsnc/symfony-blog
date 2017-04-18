@@ -11,6 +11,7 @@ use PHPUnit\Framework\TestCase;
 class UserManagerTest extends TestCase
 {
     const CURRENT_PASSWORD = 'password';
+    const INVALID_PASSWORD = 'pass';
     const NEW_PASSWORD = 'password1';
 
     /** @test */
@@ -50,6 +51,28 @@ class UserManagerTest extends TestCase
         $sut = new UserManager($repo, $encoder);
 
         $sut->changePassword($user, self::CURRENT_PASSWORD, self::NEW_PASSWORD);
+
+        $this->assertNotEquals(self::NEW_PASSWORD, $user->getPassword());
+    }
+
+    /**
+     * @test
+     * @expectedException AppBundle\Exception\User\PasswordNotValidException
+     */
+    public function itShouldThrowExceptionIfNewPasswordIsNotValid()
+    {
+        $repo = $this->getRepositoryMock();
+        $repo->expects($this->never())->method('save');
+
+        $encoder = $this->getPasswordEncoderMock();
+        $encoder->method('isPasswordValid')->willReturn(true);
+
+        $user = new User();
+        $user->setPassword(self::CURRENT_PASSWORD);
+
+        $sut = new UserManager($repo, $encoder);
+
+        $sut->changePassword($user, self::CURRENT_PASSWORD, self::INVALID_PASSWORD);
 
         $this->assertNotEquals(self::NEW_PASSWORD, $user->getPassword());
     }
