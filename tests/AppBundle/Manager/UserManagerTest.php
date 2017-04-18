@@ -77,6 +77,28 @@ class UserManagerTest extends TestCase
         $this->assertNotEquals(self::NEW_PASSWORD, $user->getPassword());
     }
 
+    /**
+     * @test
+     * @expectedException AppBundle\Exception\User\PasswordNotValidException
+     */
+    public function itShouldThrowExceptionIfNewPasswordIsTheSameAsTheOlder()
+    {
+        $repo = $this->getRepositoryMock();
+        $repo->expects($this->never())->method('save');
+
+        $encoder = $this->getPasswordEncoderMock();
+        $encoder->method('isPasswordValid')->willReturn(true);
+
+        $user = new User();
+        $user->setPassword(self::CURRENT_PASSWORD);
+
+        $sut = new UserManager($repo, $encoder);
+
+        $sut->changePassword($user, self::CURRENT_PASSWORD, self::CURRENT_PASSWORD);
+
+        $this->assertNotEquals(self::NEW_PASSWORD, $user->getPassword());
+    }
+
     private function getRepositoryMock()
     {
         $repo = $this->getMockBuilder(UserRepository::class)
