@@ -10,6 +10,8 @@ use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 
 class UserManager
 {
+    const MIN_PASSWORD_LENGTH = 6;
+
     /**
      * @var  UserRepository
      */
@@ -30,29 +32,53 @@ class UserManager
      * Changes some user password
      *
      * @param User $user
-     * @param $password1
-     * @param $password2
+     * @param $oldPassword
+     * @param $newPassword
      * @return User
      * @throws PasswordNotMatchesException|PasswordNotValidException
      */
-    public function changePassword(User $user, $password1, $password2)
+    public function changePassword(User $user, $oldPassword, $newPassword)
     {
-        if (!$this->passwordEncoder->isPasswordValid($user, $password1)) {
+        if (!$this->isOldPasswordValid($user, $oldPassword)) {
             throw new PasswordNotMatchesException();
         }
 
-        if (6 > strlen($password2)) {
+        if (!$this->isNewPasswordValid($oldPassword, $newPassword)) {
             throw new PasswordNotValidException();
         }
 
-        if ($password1 === $password2) {
-            throw new PasswordNotValidException();
-        }
-
-        $user->setPassword($password2);
+        $user->setPassword($newPassword);
 
         $this->repository->save($user);
 
         return $user;
+    }
+
+    /**
+     * @param User $user
+     * @param $oldPassword
+     * @return boolean
+     */
+    private function isOldPasswordValid(User $user, $oldPassword)
+    {
+        return $this->passwordEncoder->isPasswordValid($user, $oldPassword);
+    }
+
+    /**
+     * @param $oldPassword
+     * @param $newPassword
+     * @return boolean
+     */
+    private function isNewPasswordValid($oldPassword, $newPassword)
+    {
+        if (self::MIN_PASSWORD_LENGTH > strlen($newPassword)) {
+            return false;
+        }
+
+        if ($oldPassword === $newPassword) {
+            return false;
+        }
+
+        return true;
     }
 }
