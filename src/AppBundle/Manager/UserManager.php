@@ -6,7 +6,7 @@ use AppBundle\Entity\User;
 use AppBundle\Exception\User\PasswordNotMatchesException;
 use AppBundle\Exception\User\PasswordNotValidException;
 use AppBundle\Repository\UserRepository;
-use Symfony\Component\Security\Core\Encoder\UserPasswordEncoder;
+use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 
 class UserManager
 {
@@ -16,11 +16,11 @@ class UserManager
     private $repository;
 
     /**
-     * @var UserPasswordEncoder
+     * @var UserPasswordEncoderInterface
      */
     private $passwordEncoder;
 
-    public function __construct(UserRepository $repository, UserPasswordEncoder $passwordEncoder)
+    public function __construct(UserRepository $repository, UserPasswordEncoderInterface $passwordEncoder)
     {
         $this->repository = $repository;
         $this->passwordEncoder = $passwordEncoder;
@@ -32,11 +32,12 @@ class UserManager
      * @param User $user
      * @param $password1
      * @param $password2
+     * @return User
      * @throws PasswordNotMatchesException|PasswordNotValidException
      */
     public function changePassword(User $user, $password1, $password2)
     {
-        if ($this->passwordEncoder->isPasswordValid($user, $password1)) {
+        if (!$this->passwordEncoder->isPasswordValid($user, $password1)) {
             throw new PasswordNotMatchesException();
         }
 
@@ -51,5 +52,7 @@ class UserManager
         $user->setPassword($password2);
 
         $this->repository->save($user);
+
+        return $user;
     }
 }
