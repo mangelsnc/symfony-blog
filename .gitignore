@@ -18,3 +18,4 @@
 .idea/*
 coverage
 .vagrant
+var/data/blog.sqlite-journal
