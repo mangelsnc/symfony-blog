@@ -1,0 +1,28 @@
+---
+server:
+    install: '1'
+    packages: [git, vim, htop]
+    timezone: Europe/Madrid
+    locale: es_ES.UTF-8
+vagrant_local:
+    install: '1'
+    vm: { base_box: trusty64, hostname: testing-with-symfony, ip: 10.0.0.111, memory: '1024', sharedfolder: ./, useVagrantCloud: '1', syncType: nfs }
+nginx:
+    install: '1'
+    docroot: /vagrant/web
+    servername: testing.symfony.dev
+mysql:
+    install: '1'
+    root_password: '123'
+    database: db
+    user: user
+    password: password
+    dump: ''
+sqlite:
+    install: '1'
+php:
+    install: '1'
+    ppa: php
+    packages: [php5-cli, php5-intl, php5-mcrypt, php5-common, php5-fpm, php5-mysql, php5-sqlite, php5-curl, php5-xdebug]
+    peclpackages: [sqlite3, json]
+
