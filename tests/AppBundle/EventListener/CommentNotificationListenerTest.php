@@ -4,36 +4,69 @@ namespace Tests\AppBundle\EventListener;
 
 use AppBundle\Entity\Comment;
 use AppBundle\Entity\Post;
+use AppBundle\Entity\User;
 use AppBundle\EventListener\CommentNotificationListener;
 use Symfony\Component\EventDispatcher\GenericEvent;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Translation\TranslatorInterface;
+use Mockery as Mockery;
+use PHPUnit\Framework\TestCase;
 
-class CommentNotificationListenerTest extends \PHPUnit_Framework_TestCase
+class CommentNotificationListenerTest extends TestCase
 {
+    public function tearDown()
+    {
+        Mockery::close();
+    }
+
     /** @test */
     public function itShouldSendAnEmailWhenACommentIsCreated()
     {
-        $mailerMock = $this->getMockBuilder(\Swift_Mailer::class)
-            ->disableOriginalConstructor()
-            ->setMethods(['send'])
-            ->getMock()
-        ;
-        $mailerMock->expects($this->once())->method('send');
 
-        $urlGeneratorMock = $this->getMockBuilder(UrlGeneratorInterface::class)
-            ->disableOriginalConstructor()
-            ->setMethods(['generate', 'setContext', 'getContext'])
-            ->getMock()
-        ;
+        /**
+         * PHPUnit
+         */
+//        $mailerMock = $this->getMockBuilder(\Swift_Mailer::class)
+//            ->disableOriginalConstructor()
+//            ->setMethods(['send'])
+//            ->getMock()
+//        ;
+//        $mailerMock->expects($this->once())->method('send');
 
-        $translatorMock = $this->getMockBuilder(TranslatorInterface::class)
-            ->disableOriginalConstructor()
-            ->setMethods(['trans', 'transChoice', 'setLocale', 'getLocale'])
-            ->getMock()
-        ;
+        /**
+         * Mockery
+         */
+        $mailerMock = Mockery::mock(\Swift_Mailer::class);
+        $mailerMock->shouldReceive('send')->once();
 
-        $authorMock = $this->getMockBuilder(Author::class)
+        /**
+         * PHPUnit
+         */
+//        $urlGeneratorMock = $this->getMockBuilder(UrlGeneratorInterface::class)
+//            ->disableOriginalConstructor()
+//            ->setMethods(['generate', 'setContext', 'getContext'])
+//            ->getMock()
+//        ;
+
+        /**
+         * Mockery
+         */
+        $urlGeneratorMock = Mockery::mock(UrlGeneratorInterface::class);
+        $urlGeneratorMock->shouldReceive('generate', 'setContext', 'getContext');
+
+        /**
+         * PHPUnit
+         */
+//        $translatorMock = $this->getMockBuilder(TranslatorInterface::class)
+//            ->disableOriginalConstructor()
+//            ->setMethods(['trans', 'transChoice', 'setLocale', 'getLocale'])
+//            ->getMock()
+//        ;
+
+        $translatorMock = Mockery::mock(TranslatorInterface::class);
+        $translatorMock->shouldReceive('trans', 'transChoice', 'setLocale', 'getLocale');
+
+        $authorMock = $this->getMockBuilder(User::class)
             ->setMethods(['getEmail'])
             ->getMock()
         ;
@@ -50,12 +83,14 @@ class CommentNotificationListenerTest extends \PHPUnit_Framework_TestCase
         ;
         $commentMock->method('getPost')->willReturn($postMock);
 
-        $eventMock = $this->getMockBuilder(GenericEvent::class)
-            ->disableOriginalConstructor()
-            ->setMethods(['getSubject'])
-            ->getMock()
-        ;
-        $eventMock->method('getSubject')->willReturn($commentMock);
+//        $eventMock = $this->getMockBuilder(GenericEvent::class)
+//            ->disableOriginalConstructor()
+//            ->setMethods(['getSubject'])
+//            ->getMock()
+//        ;
+//        $eventMock->method('getSubject')->willReturn($commentMock);
+        $eventMock = Mockery::mock(GenericEvent::class);
+        $eventMock->shouldReceive('getSubject')->once()->andReturn($commentMock);
 
         $sut = new CommentNotificationListener(
             $mailerMock,
