@@ -45,6 +45,7 @@
         "dama/doctrine-test-bundle": "^1.0",
         "friendsofphp/php-cs-fixer": "^2.0",
         "mockery/mockery": "^0.9.9",
+        "phpspec/phpspec": "^3.2",
         "phpspec/prophecy": "~1.0",
         "phpunit/phpunit": "^4.8 || ^5.0",
         "sensio/generator-bundle": "^3.0",
