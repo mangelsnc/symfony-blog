@@ -28,6 +28,10 @@
             </exclude>
         </whitelist>
     </filter>
+    <logging>
+        <log type="coverage-clover" target="./phpunit/tests-clover.xml"/>
+        <log type="junit" target="./phpunit/tests-junit.xml" logIncompleteSkipped="false"/>
+    </logging>
 
     <listeners>
         <!-- it begins a database transaction before every testcase and rolls it back after

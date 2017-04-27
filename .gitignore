@@ -19,3 +19,4 @@
 coverage
 .vagrant
 var/data/blog.sqlite-journal
+phpunit/*
